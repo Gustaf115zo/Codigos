@@ -1,7 +1,8 @@
 %% State Space Control
 clc
-%%
-A1=7.068;
+clear
+%% variables del sistema
+A1=1.8869;
 A2=1.8869;
 AC=0.0045;
 Ab=0.0045;
@@ -13,14 +14,14 @@ alpha= (sqrt(2*g))*(Ab*R1);
 beta= (sqrt(2*g))*(AC*R2);
 
 A = [ -alpha/A1   alpha/A1   
-     alpha/A2  -(alpha+beta)/A2 ]
+     alpha/A2  -(alpha+beta)/A2 ];
 
 B =  [ 1/A1
-        0 ]
+        0 ];
 
-C = [ 0  1 ]
+C = [ 0  1 ];
 
-D = [0]
+D = [0];
 
 %% find poles of the system
 
@@ -29,21 +30,21 @@ poles = eig(A)
 %% Open loop response
 
 t = 0:0.01:5;
-u = zeros(size(t));
-x0 = [0.01 0];
+u = ones(size(t));
+x0 = [2 0.2];
 
 sys = ss(A,B,C,0);
 
 [y,t,x] = lsim(sys,u,t,x0);
-plot(t,y)
+plot(t,y);
 title('Open-Loop Response to Non-Zero Initial Condition')
 xlabel('Time (sec)')
 ylabel('Altura (m)')
 
 %% Controlling to an equilibrium
 
-p1 = -5 + 2i;
-p2 = -5 - 2i;
+p1 = -1 + 1i;
+p2 = -1 - 1i;
 
 K = place(A,B,[p1 p2]);
 sys_cl = ss(A-B*K,B,C,0);
@@ -55,7 +56,7 @@ ylabel('Altura (m)')
 
 %% Reference tracking
 
-t = 0:0.001:2;
+t = 0:0.01:20;
 u = ones(size(t));
 
 sys_cl = ss(A-B*K,B,C,0);
@@ -64,7 +65,7 @@ lsim(sys_cl,u,t);
 title('Reference tracking')
 xlabel('Time (sec)')
 ylabel('Altura (m)')
-axis([0 2 0 2E-4])
+axis([0 2 0 2E-2])
 
 %% Including the scaling factor
 
@@ -73,8 +74,8 @@ Nbar = rscale(sys,K)
 lsim(sys_cl,Nbar*u,t)
 title('Including the scaling factor')
 xlabel('Time (sec)')
-ylabel('Altura (m)')
-axis([0 2 0 1.2])
+ylabel('Altura (m)')    
+axis([0 20 0 2])
 
 %% Observers
 
